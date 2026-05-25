@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Umrah Package Calculator — QTB Meezab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --emerald:#1a5c3a;--emerald-light:#2d8a5a;--gold:#c9a84c;--gold-light:#f0d080;
+  --cream:#faf7f0;--warm-white:#fff;--text-dark:#1a1a1a;--text-mid:#3d3d3d;
+  --text-soft:#6b6b6b;--border:#e2d9c5;--section-bg:#f5f0e8;--input-bg:#fffef9;
+  --danger:#c0392b;--pkr:#1a3a6b;--radius:10px;
+}
+body{background:var(--cream);font-family:'Source Sans 3',sans-serif;color:var(--text-dark);font-size:15px}
+.app{max-width:1100px;margin:0 auto;padding:16px 14px 80px}
+
+.header{background:linear-gradient(135deg,var(--emerald) 0%,#0d3b25 100%);border-radius:14px;
+  padding:22px 26px;display:flex;align-items:center;gap:18px;margin-bottom:6px;position:relative;overflow:hidden}
+.header::before{content:'☪';position:absolute;right:22px;top:50%;transform:translateY(-50%);
+  font-size:90px;opacity:.07;color:var(--gold);pointer-events:none}
+.header-logo-wrap{width:62px;height:62px;border-radius:50%;overflow:hidden;flex-shrink:0;
+  box-shadow:0 0 0 3px var(--gold);background:var(--gold);display:flex;align-items:center;justify-content:center}
+.header-logo-wrap img{width:100%;height:100%;object-fit:cover}
+.header-logo-text{font-size:26px;color:var(--emerald);font-weight:700;font-family:'Playfair Display',serif}
+.header-text h1{font-family:'Playfair Display',serif;color:var(--gold-light);font-size:1.35rem;font-weight:700}
+.header-text p{color:rgba(255,255,255,.65);font-size:.79rem;margin-top:2px}
+.header-badge{margin-left:auto;background:rgba(201,168,76,.15);border:1px solid var(--gold);
+  color:var(--gold-light);padding:5px 12px;border-radius:20px;font-size:.75rem;font-weight:600;
+  letter-spacing:1px;text-transform:uppercase;flex-shrink:0}
+
+.tabs{display:flex;gap:0;background:#e8e1d3;border-radius:10px;padding:4px;margin:14px 0 10px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab-btn{flex:1;min-width:70px;padding:8px 6px;border:none;background:transparent;border-radius:7px;
+  font-size:.71rem;font-weight:600;color:var(--text-soft);cursor:pointer;transition:all .2s;white-space:nowrap;font-family:inherit}
+.tab-btn.active{background:var(--emerald);color:#fff;box-shadow:0 2px 8px rgba(26,92,58,.3)}
+.tab-btn:hover:not(.active){background:rgba(26,92,58,.1);color:var(--emerald)}
+
+.card{background:var(--warm-white);border-radius:var(--radius);border:1px solid var(--border);
+  margin-bottom:16px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.05)}
+.card-header{background:var(--section-bg);border-bottom:1px solid var(--border);
+  padding:11px 18px;display:flex;align-items:center;gap:8px}
+.card-header h2{font-family:'Playfair Display',serif;font-size:.95rem;color:var(--emerald);font-weight:700}
+.card-body{padding:16px 18px}
+
+.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:.71rem;font-weight:600;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px}
+.form-group input,.form-group select,.form-group textarea{border:1.5px solid var(--border);border-radius:7px;
+  padding:7px 10px;font-size:.86rem;color:var(--text-dark);background:var(--input-bg);
+  transition:border .2s;font-family:inherit;width:100%}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--emerald-light)}
+.full{grid-column:1/-1}
+
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:.81rem;min-width:500px}
+thead tr{background:var(--emerald);color:#fff}
+thead th{padding:9px 8px;text-align:left;font-weight:600;font-size:.73rem;letter-spacing:.3px;white-space:nowrap}
+tbody tr{border-bottom:1px solid #f0ebe0}
+tbody td{padding:7px 8px;vertical-align:middle}
+tbody td input,tbody td select{border:1.5px solid var(--border);border-radius:6px;padding:4px 7px;
+  font-size:.8rem;background:var(--input-bg);font-family:inherit;width:100%;min-width:55px}
+tbody td input:focus,tbody td select:focus{outline:none;border-color:var(--emerald-light)}
+.td-num{text-align:right;font-weight:600;color:var(--emerald)}
+.td-pkr{text-align:right;font-size:.74rem;color:var(--pkr);font-weight:600}
+.td-center{text-align:center}
+.tfoot-row{background:#f5f0e8;font-weight:700}
+.tfoot-row td{padding:9px 8px;color:var(--emerald)}
+
+.btn{border:none;border-radius:7px;padding:7px 14px;font-size:.8rem;font-weight:600;cursor:pointer;
+  transition:all .2s;font-family:inherit;display:inline-flex;align-items:center;gap:4px}
+.btn-primary{background:var(--emerald);color:#fff}.btn-primary:hover{background:var(--emerald-light)}
+.btn-gold{background:var(--gold);color:#1a1a1a}.btn-gold:hover{background:var(--gold-light)}
+.btn-danger{background:#fff0ee;color:var(--danger);border:1.5px solid #f5c6c2}.btn-danger:hover{background:#ffe0dc}
+.btn-secondary{background:#e8f0fb;color:var(--pkr);border:1.5px solid #b8cef0}.btn-secondary:hover{background:#d0e0f5}
+.btn-success{background:#e8f5ee;color:var(--emerald);border:1.5px solid #b8e5d0}.btn-success:hover{background:#d0f0e0}
+.btn-sm{padding:3px 9px;font-size:.73rem}
+.btn-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+
+.counter{display:flex;align-items:center}
+.counter button{width:28px;height:28px;border:1.5px solid var(--border);background:var(--section-bg);
+  cursor:pointer;font-size:.95rem;font-family:inherit;transition:all .2s}
+.counter button:first-child{border-radius:7px 0 0 7px}
+.counter button:last-child{border-radius:0 7px 7px 0}
+.counter button:hover{background:var(--emerald);color:#fff;border-color:var(--emerald)}
+.counter span{width:38px;height:28px;border-top:1.5px solid var(--border);border-bottom:1.5px solid var(--border);
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.88rem;background:#fff}
+
+.tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.7rem;font-weight:700;letter-spacing:.4px}
+.tag-green{background:#e8f5ee;color:var(--emerald)}.tag-gold{background:#fdf4dc;color:#8a6a00}
+.night-badge{background:var(--emerald);color:#fff;border-radius:20px;padding:2px 8px;font-size:.72rem;font-weight:600;white-space:nowrap}
+
+.fx-banner{background:linear-gradient(90deg,#e8f0fb 0%,#f0f5ff 100%);border:1.5px solid #b8cef0;
+  border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.fx-flag{font-size:1.4rem}
+.fx-label{font-size:.78rem;color:var(--pkr);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.fx-rate-input{border:1.5px solid #b8cef0;border-radius:7px;padding:5px 10px;font-size:.9rem;
+  font-weight:700;color:var(--pkr);background:#fff;width:110px;font-family:inherit}
+.fx-rate-input:focus{outline:none;border-color:var(--pkr)}
+.fx-eq{font-size:.82rem;color:var(--text-soft);margin-left:auto}
+.fx-eq strong{color:var(--pkr)}
+
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:640px){.summary-grid{grid-template-columns:1fr}}
+.sum-row{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid #f0ebe0;font-size:.86rem;gap:8px}
+.sum-row:last-child{border-bottom:none}
+.sum-row.total{font-weight:700;font-size:.95rem;color:var(--emerald);padding-top:10px}
+.sum-row.gross{font-weight:600;background:#f5f0e8;margin:3px -4px;padding:8px 4px;border-radius:6px}
+.sum-label{color:var(--text-mid);flex-shrink:0}
+.sum-val-wrap{text-align:right}
+.sum-val{font-weight:600;display:block}
+.sum-val.green{color:var(--emerald)}
+.sum-pkr{font-size:.72rem;color:var(--pkr);font-weight:600;display:block;margin-top:1px}
+
+.grand-box{background:linear-gradient(135deg,var(--emerald) 0%,#0d3b25 100%);border-radius:12px;
+  padding:22px 26px;margin-top:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px}
+.grand-label{color:rgba(255,255,255,.8);font-size:.82rem;letter-spacing:.5px;text-transform:uppercase}
+.grand-amount{font-family:'Playfair Display',serif;color:var(--gold-light);font-size:2rem;font-weight:700;line-height:1.1}
+.grand-pkr{font-family:'Playfair Display',serif;color:#a8c4f0;font-size:1.1rem;font-weight:500;margin-top:3px}
+.grand-sub{color:rgba(255,255,255,.6);font-size:.74rem;margin-top:3px}
+
+.sec-total{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:8px;
+  padding-top:8px;border-top:2px solid var(--border);font-weight:700;font-size:.88rem;color:var(--emerald)}
+
+.pcard{border:1.5px solid var(--border);border-radius:9px;padding:12px 14px;margin-bottom:10px;background:var(--input-bg)}
+.pcard-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.pnum{width:24px;height:24px;border-radius:50%;background:var(--emerald);color:#fff;display:flex;
+  align-items:center;justify-content:center;font-size:.72rem;font-weight:700}
+
+.logo-upload-zone{border:2px dashed var(--border);border-radius:10px;padding:20px;text-align:center;
+  cursor:pointer;transition:all .2s;background:var(--input-bg);position:relative}
+.logo-upload-zone:hover{border-color:var(--emerald-light);background:#f0f9f4}
+.logo-upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.logo-preview{width:90px;height:90px;border-radius:10px;object-fit:cover;border:2px solid var(--border);margin:0 auto 8px;display:block}
+.logo-preview-wrap{text-align:center}
+
+.summary-logo{width:80px;height:80px;border-radius:10px;object-fit:cover;
+  border:2px solid var(--border);box-shadow:0 2px 10px rgba(0,0,0,.1)}
+
+.note-box{background:#fffbee;border:1px solid #e8d88a;border-radius:8px;padding:9px 13px;font-size:.8rem;color:#7a6200;margin-top:9px}
+.divider{height:1px;background:var(--border);margin:14px 0}
+.section-divider{display:flex;align-items:center;gap:10px;margin:20px 0 14px}
+.section-divider span{font-size:.72rem;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap}
+.section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.history-panel{max-height:400px;overflow-y:auto;border:1px solid var(--border);border-radius:10px;background:var(--input-bg)}
+.history-item{padding:12px 14px;border-bottom:1px solid #f0ebe0;cursor:pointer;transition:all .2s;display:flex;justify-content:space-between;align-items:center}
+.history-item:last-child{border-bottom:none}
+.history-item:hover{background:#f5f0e8}
+.history-item-info{flex:1}
+.history-item-name{font-weight:600;font-size:.88rem;color:var(--text-dark)}
+.history-item-meta{font-size:.72rem;color:var(--text-soft);margin-top:2px}
+.history-item-amount{font-weight:700;color:var(--emerald);text-align:right;white-space:nowrap;margin-left:10px}
+.history-actions{display:flex;gap:4px}
+.history-actions button{padding:3px 6px;font-size:.7rem}
+.empty-state{text-align:center;padding:20px;color:var(--text-soft);font-size:.82rem}
+
+.print-fab{position:fixed;bottom:20px;right:20px;z-index:99;border-radius:50%;width:52px;height:52px;
+  display:flex;align-items:center;justify-content:center;font-size:1.2rem;
+  background:var(--emerald);color:#fff;border:none;cursor:pointer;
+  box-shadow:0 4px 20px rgba(26,92,58,.45);transition:all .2s}
+.print-fab:hover{background:var(--emerald-light);transform:scale(1.1)}
+
+.modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,.5);overflow-y:auto}
+.modal.show{display:flex;align-items:center;justify-content:center}
+.modal-content{background:var(--cream);border-radius:14px;max-width:1100px;width:90%;max-height:90vh;overflow-y:auto;padding:0}
+.modal-header{background:var(--emerald);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center}
+.modal-header h2{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700}
+.modal-close{background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;font-weight:700}
+.modal-body{padding:20px}
+
+@media print{
+  .tabs,.btn,.btn-row,.print-fab,.fx-banner,.history-panel,.modal,.section-divider{display:none!important}
+  .card{box-shadow:none;break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="header-logo-wrap" id="headerLogoWrap">
+      <span class="header-logo-text" id="headerLogoText">Q</span>
+    </div>
+    <div class="header-text">
+      <h1 id="hAgency">ABC Travel & Tours</h1>
+      <p id="hAddress">ABC Street, Main Road, ABC City</p>
+      <p id="hPhone">0300-123-4567 · 0321-987-6543</p>
+    </div>
+    <div class="header-badge">☪ Umrah Calculator</div>
+  </div>
+
+  <div class="tabs" id="tabBar"></div>
+  <div id="panels"></div>
+  <button class="print-fab" onclick="window.print()" title="Print Current Invoice">🖨️</button>
+</div>
+
+<div class="modal" id="viewModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>📊 Saved Package Details</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  STATE & LOCAL STORAGE
+// ═══════════════════════════════════════════════════════════
+const STORAGE_KEY = 'umrahCalculatorData';
+const HISTORY_KEY = 'umrahCalculatorHistory';
+
+const DEFAULT_STATE = {
+  booking:{
+    agencyName:"ABC Travel & Tours",
+    address:"ABC Street, Main Road, ABC City",
+    phone:"0300-123-4567 · 0321-987-6543",
+    bookingNo:"UB-101140",packageType:"Standard",
+    bookingDate:"2026-02-22",voucherDate:"2026-02-25",
+    agencyLabel:"ABC TRAVEL & TOURS",voucherNote:"VISA+ACC"
+  },
+  exchangeRate: 75.5,
+  logoData: null,
+  visa:{adult:599,child:599,infant:500},
+  adults:5,children:0,infants:0,
+  pilgrims:[
+    {id:1,passport:"AB1234567",name:"ABCDEF GHIJKL",dob:"1999-12-31",pax:"Adult"},
+    {id:2,passport:"AB2345678",name:"ABCDEF MNOPQR",dob:"1999-12-31",pax:"Adult"},
+    {id:3,passport:"AB3456789",name:"ABCDEF STUVWX",dob:"1999-12-31",pax:"Adult"},
+    {id:4,passport:"AB4567890",name:"ABCDEF YZABCD",dob:"1999-12-31",pax:"Adult"},
+    {id:5,passport:"AB5678901",name:"ABCDEF EFGHIJ",dob:"1999-12-31",pax:"Adult"}
+  ],
+  accommodation:[
+    {id:1,city:"Makkah",hotel:"ABC HOTEL AZIZIA",checkin:"2026-03-15",checkout:"2026-03-22",roomType:"Quint Bed",qty:1,rate:48.63},
+    {id:2,city:"Madinah",hotel:"ABC HOTEL MADINA",checkin:"2026-03-22",checkout:"2026-03-29",roomType:"Quint Bed",qty:1,rate:39.00},
+    {id:3,city:"Makkah",hotel:"ABC HOTEL AZIZIA",checkin:"2026-03-29",checkout:"2026-04-04",roomType:"Quint Bed",qty:1,rate:14.00}
+  ],
+  transport:[
+    {id:1,vehicle:"Economy By Bus",route:"Round Trip (Jed-Mak-Med-Mak-Jed)",rate:0,qty:1}
+  ],
+  tickets:[
+    {id:1,description:"ABC Airlines Flight (PK→JED→PK)",adultRate:35000,adultQty:5,childRate:28000,childQty:0,infantRate:0,infantQty:0}
+  ],
+  services:[
+    {id:1,name:"Ziyarat Tour (Makkah)",adultRate:3780,adultQty:5,childRate:2268,childQty:0,infantRate:0,infantQty:0},
+    {id:2,name:"Ziyarat Tour (Madinah)",adultRate:3024,adultQty:5,childRate:1890,childQty:0,infantRate:0,infantQty:0}
+  ],
+  adjustment:0,receipts:0,
+  nextId:100
+};
+
+let S = loadFromStorage();
+let activeTab = 0;
+
+const TABS=["📋 Booking","🛂 Visa","🕋 Pilgrims","🏨 Stay","🚌 Transport","✈️ Tickets","🎯 Services","📊 Summary","📜 History"];
+const CITIES=["Makkah","Madinah","Jeddah","Taif"];
+const ROOMS=["Single","Double","Triple","Quad Bed","Quint Bed","Hexa Bed"];
+const VEHICLES=["Economy By Bus","Deluxe Bus","Van (7 Seater)","SUV (4 Seater)","Private Car"];
+const ROUTES=["Round Trip (Jed-Mak-Med-Mak-Jed)","One Way Jeddah → Makkah","One Way Makkah → Madinah","One Way Madinah → Jeddah","Jeddah Airport Transfer Only"];
+const PAXES=["Adult","Child","Infant"];
+const PKGS=["Standard","Economy","Premium","VIP","Luxury"];
+
+// ═══════════════════════════════════════════════════════════
+//  STORAGE FUNCTIONS
+// ═══════════════════════════════════════════════════════════
+function loadFromStorage(){
+  try{const saved=localStorage.getItem(STORAGE_KEY);return saved?JSON.parse(saved):JSON.parse(JSON.stringify(DEFAULT_STATE))}catch(e){return JSON.parse(JSON.stringify(DEFAULT_STATE))}
+}
+function saveToStorage(){
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(S));
+}
+function updateHeaderFromState(){
+  document.getElementById('hAgency').textContent=S.booking.agencyName||'ABC Travel & Tours';
+  document.getElementById('hAddress').textContent=S.booking.address||'ABC Street, Main Road, ABC City';
+  document.getElementById('hPhone').textContent=S.booking.phone||'0300-123-4567 · 0321-987-6543';
+}
+function addToHistory(){
+  const c=calc();
+  const pax=S.adults+S.children+S.infants;
+  const h={
+    id:Date.now(),
+    agencyLabel:S.booking.agencyLabel,
+    pax:pax,
+    net:c.net,
+    netPKR:Math.round(c.net*S.exchangeRate),
+    timestamp:new Date().toLocaleString(),
+    data:JSON.parse(JSON.stringify(S))
+  };
+  let history=[];
+  try{history=JSON.parse(localStorage.getItem(HISTORY_KEY))||[]}catch(e){}
+  history.unshift(h);
+  history=history.slice(0,50);
+  localStorage.setItem(HISTORY_KEY,JSON.stringify(history));
+  alert('✅ Package saved to history!');
+}
+function getHistory(){
+  try{return JSON.parse(localStorage.getItem(HISTORY_KEY))||[]}catch(e){return[]}
+}
+function loadHistoryItem(id){
+  const history=getHistory();
+  const item=history.find(h=>h.id===id);
+  if(item){S=JSON.parse(JSON.stringify(item.data));saveToStorage();updateHeaderFromState();switchTab(7)}
+}
+function viewHistoryItem(id){
+  const history=getHistory();
+  const item=history.find(h=>h.id===id);
+  if(item){
+    const savedS=JSON.parse(JSON.stringify(item.data));
+    const html=renderSummaryForModal(savedS);
+    document.getElementById('modalBody').innerHTML=html;
+    document.getElementById('viewModal').classList.add('show');
+  }
+}
+function deleteHistoryItem(id){
+  let history=getHistory();
+  history=history.filter(h=>h.id!==id);
+  localStorage.setItem(HISTORY_KEY,JSON.stringify(history));
+  rerender();
+}
+function closeModal(){
+  document.getElementById('viewModal').classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════════
+function uid(){return ++S.nextId}
+function nights(ci,co){if(!ci||!co)return 0;const d=(new Date(co)-new Date(ci))/86400000;return Math.max(0,Math.floor(d))}
+function fmt(n){return Number(n||0).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2})}
+function fmtPKR(sar,rate){const r=rate||S.exchangeRate;return Math.round(sar*r).toLocaleString('en-PK')}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+// ═══════════════════════════════════════════════════════════
+//  CALC
+// ═══════════════════════════════════════════════════════════
+function calc(state=S){
+  const vt=state.adults*state.visa.adult+state.children*state.visa.child+state.infants*state.visa.infant;
+  const at=state.accommodation.reduce((s,a)=>s+nights(a.checkin,a.checkout)*a.qty*a.rate,0);
+  const tt=state.transport.reduce((s,t)=>s+t.rate*t.qty,0);
+  const sv=state.services.reduce((s,x)=>s+x.adultRate*x.adultQty+x.childRate*x.childQty+x.infantRate*x.infantQty,0);
+  const tk=state.tickets.reduce((s,x)=>s+x.adultRate*x.adultQty+x.childRate*x.childQty+x.infantRate*x.infantQty,0);
+  const gross=vt+at+tt+sv+tk;
+  const net=gross-Number(state.adjustment);
+  const bal=net-Number(state.receipts);
+  return{vt,at,tt,sv,tk,gross,net,bal};
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PATCH TOTALS
+// ═══════════════════════════════════════════════════════════
+function patchTotals(){
+  const c=calc();
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
+
+  set('vt-adult','SAR '+fmt(S.adults*S.visa.adult));
+  set('vt-child','SAR '+fmt(S.children*S.visa.child));
+  set('vt-infant','SAR '+fmt(S.infants*S.visa.infant));
+  set('vt-total','SAR '+fmt(c.vt));
+
+  S.accommodation.forEach(a=>{
+    const n=nights(a.checkin,a.checkout);
+    set('acc-amt-'+a.id,fmt(n*a.qty*a.rate));
+    set('acc-nights-'+a.id,n+'N');
+  });
+  const totalN=S.accommodation.reduce((s,a)=>s+nights(a.checkin,a.checkout),0);
+  set('acc-total','SAR '+fmt(c.at));
+  set('acc-total-nights',totalN+'N');
+  set('acc-total-footer','SAR '+fmt(c.at));
+
+  S.transport.forEach(t=>set('tr-amt-'+t.id,fmt(t.rate*t.qty)));
+  set('tr-total','SAR '+fmt(c.tt));
+
+  S.tickets.forEach(t=>{
+    const tot=t.adultRate*t.adultQty+t.childRate*t.childQty+t.infantRate*t.infantQty;
+    set('tk-amt-'+t.id,'PKR '+fmt(tot));
+  });
+  set('tk-total','PKR '+fmt(c.tk));
+
+  S.services.forEach(sv=>{
+    const tot=sv.adultRate*sv.adultQty+sv.childRate*sv.childQty+sv.infantRate*sv.infantQty;
+    set('sv-amt-'+sv.id,fmt(tot));
+  });
+  set('sv-total','SAR '+fmt(c.sv));
+
+  set('fx-eq-label','1 SAR = PKR '+S.exchangeRate);
+
+  set('sum-vt','SAR '+fmt(c.vt));        set('sum-vt-pkr','≈ PKR '+fmtPKR(c.vt));
+  set('sum-at','SAR '+fmt(c.at));        set('sum-at-pkr','≈ PKR '+fmtPKR(c.at));
+  set('sum-tt','SAR '+fmt(c.tt));        set('sum-tt-pkr','≈ PKR '+fmtPKR(c.tt));
+  set('sum-tk','PKR '+fmt(c.tk));        set('sum-tk-pkr','(PKR Only)');
+  set('sum-sv','SAR '+fmt(c.sv));        set('sum-sv-pkr','≈ PKR '+fmtPKR(c.sv));
+  set('sum-gross','SAR '+fmt(c.gross));  set('sum-gross-pkr','≈ PKR '+fmtPKR(c.gross));
+  set('sum-net','SAR '+fmt(c.net));      set('sum-net-pkr','≈ PKR '+fmtPKR(c.net));
+  set('sum-net2','SAR '+fmt(c.net));
+  set('sum-bal','SAR '+fmt(c.bal));      set('sum-bal-pkr','≈ PKR '+fmtPKR(c.bal));
+  set('grand-amount','SAR '+fmt(c.net));
+  set('grand-pkr','≈ PKR '+fmtPKR(c.net));
+  set('grand-bal','Balance: SAR '+fmt(c.bal)+' / PKR '+fmtPKR(c.bal));
+
+  const balEl=document.getElementById('sum-bal');
+  if(balEl)balEl.style.color=c.bal>0?'var(--danger)':'var(--emerald-light)';
+  
+  saveToStorage();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  FX BANNER
+// ═══════════════════════════════════════════════════════════
+function fxBanner(){
+  return `<div class="fx-banner">
+    <span class="fx-flag">🇸🇦➜🇵🇰</span>
+    <div>
+      <div class="fx-label">SAR → PKR Exchange Rate</div>
+      <input class="fx-rate-input" type="number" min="1" step="0.01" value="${S.exchangeRate}"
+        oninput="S.exchangeRate=+this.value;patchTotals();updateFxPreview()"/>
+    </div>
+    <div class="fx-eq" id="fx-eq-label">1 SAR = PKR ${S.exchangeRate}</div>
+  </div>`;
+}
+
+function fxPreviewHtml(){
+  return `<div>SAR 100 &nbsp;=&nbsp; <strong>PKR ${fmtPKR(100)}</strong></div>
+          <div>SAR 500 &nbsp;=&nbsp; <strong>PKR ${fmtPKR(500)}</strong></div>
+          <div>SAR 1,000 =&nbsp; <strong>PKR ${fmtPKR(1000)}</strong></div>
+          <div>SAR 5,000 =&nbsp; <strong>PKR ${fmtPKR(5000)}</strong></div>`;
+}
+function updateFxPreview(){
+  const el=document.getElementById('fx-preview-box');
+  if(el)el.innerHTML=fxPreviewHtml();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  FULL RENDER
+// ═══════════════════════════════════════════════════════════
+function rerender(){
+  document.getElementById('tabBar').innerHTML=
+    TABS.map((t,i)=>`<button class="tab-btn${activeTab===i?' active':''}" onclick="switchTab(${i})">${t}</button>`).join('');
+  const fns=[renderBooking,renderVisa,renderPilgrims,renderAccommodation,renderTransport,renderTickets,renderServices,renderSummary,renderHistory];
+  document.getElementById('panels').innerHTML=fns[activeTab]();
+}
+function switchTab(i){activeTab=i;rerender()}
+
+// ═══════════════════════════════════════════════════════════
+//  TAB 0 — BOOKING
+// ═══════════════════════════════════════════════════════════
+function renderBooking(){
+  const b=S.booking;
+  const logoHtml=S.logoData
+    ?`<div class="logo-preview-wrap"><img class="logo-preview" src="${S.logoData}" alt="Logo"/><br>
+       <button class="btn btn-danger btn-sm" style="margin-top:6px" onclick="removeLogo()">🗑 Remove Logo</button></div>`
+    :`<div class="logo-upload-zone">
+        <input type="file" accept="image/*" onchange="handleLogoUpload(event)"/>
+        <div style="font-size:2rem;margin-bottom:6px">🖼️</div>
+        <div style="font-weight:600;font-size:.85rem;color:var(--emerald)">Click to Upload Logo</div>
+        <div style="font-size:.75rem;color:var(--text-soft);margin-top:3px">PNG, JPG, SVG — shown in Summary & Print</div>
+      </div>`;
+
+  return `<div class="card">
+  <div class="card-header"><span>📋</span><h2>Booking Information</h2></div>
+  <div class="card-body">
+    <div class="form-grid">
+      <div class="form-group"><label>Agency Name</label>
+        <input value="${esc(b.agencyName)}" oninput="S.booking.agencyName=this.value;updateHeaderFromState();saveToStorage()"/></div>
+      <div class="form-group"><label>Agency Phone</label>
+        <input value="${esc(b.phone)}" oninput="S.booking.phone=this.value;updateHeaderFromState();saveToStorage()"/></div>
+      <div class="form-group"><label>Booking Number</label>
+        <input value="${esc(b.bookingNo)}" oninput="S.booking.bookingNo=this.value;saveToStorage()"/></div>
+      <div class="form-group"><label>Package Type</label>
+        <select onchange="S.booking.packageType=this.value;saveToStorage()">${PKGS.map(p=>`<option${p===b.packageType?' selected':''}>${p}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Booking Date</label>
+        <input type="date" value="${b.bookingDate}" onchange="S.booking.bookingDate=this.value;saveToStorage()"/></div>
+      <div class="form-group"><label>Voucher Date</label>
+        <input type="date" value="${b.voucherDate}" onchange="S.booking.voucherDate=this.value;saveToStorage()"/></div>
+      <div class="form-group"><label>Agency Label (for History)</label>
+        <input value="${esc(b.agencyLabel)}" oninput="S.booking.agencyLabel=this.value;saveToStorage()" placeholder="e.g., ABC TRAVEL & TOURS"/></div>
+      <div class="form-group"><label>Voucher Note</label>
+        <input value="${esc(b.voucherNote)}" oninput="S.booking.voucherNote=this.value;saveToStorage()"/></div>
+      <div class="form-group full"><label>Agency Address</label>
+        <textarea rows="2" oninput="S.booking.address=this.value;updateHeaderFromState();saveToStorage()"
+          style="border:1.5px solid var(--border);border-radius:7px;padding:7px 10px;font-family:inherit;font-size:.86rem;resize:vertical;width:100%;background:var(--input-bg)">${esc(b.address)}</textarea>
+      </div>
+    </div>
+  </div></div>
+
+  <div class="section-divider"><span>⚙️ Currency & Branding Settings</span></div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div class="card">
+      <div class="card-header"><span>🇸🇦</span><h2>SAR → PKR Exchange Rate</h2></div>
+      <div class="card-body">
+        <div class="form-group" style="margin-bottom:12px">
+          <label>Rate (1 SAR = ? PKR)</label>
+          <input type="number" min="1" step="0.01" value="${S.exchangeRate}"
+            oninput="S.exchangeRate=+this.value;patchTotals();updateFxPreview()"
+            style="font-size:1.1rem;font-weight:700;color:var(--pkr)"/>
+        </div>
+        <div id="fx-preview-box" style="background:#eef3fc;border-radius:8px;padding:10px 14px;font-size:.82rem;color:var(--pkr);line-height:1.8">
+          ${fxPreviewHtml()}
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span>🖼️</span><h2>Agency Logo / Photo</h2></div>
+      <div class="card-body">${logoHtml}</div>
+    </div>
+  </div>`;
+}
+
+function handleLogoUpload(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    S.logoData=ev.target.result;
+    saveToStorage();
+    updateHeaderLogo();
+    rerender();
+  };
+  reader.readAsDataURL(file);
+}
+function removeLogo(){
+  S.logoData=null;
+  saveToStorage();
+  updateHeaderLogo();
+  rerender();
+}
+function updateHeaderLogo(){
+  const wrap=document.getElementById('headerLogoWrap');
+  if(!wrap)return;
+  if(S.logoData){
+    wrap.innerHTML=`<img src="${S.logoData}" alt="Logo" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>`;
+  }else{
+    wrap.innerHTML=`<span class="header-logo-text">Q</span>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TAB 1 — VISA
+// ═══════════════════════════════════════════════════════════
+function renderVisa(){
+  const c=calc();
+  return `<div class="card">
+  <div class="card-header"><span>🛂</span><h2>Visa Rates & Pilgrim Count</h2></div>
+  <div class="card-body">
+    <div class="table-wrap"><table>
+      <thead><tr><th>PAX Type</th><th>Rate (SAR)</th><th>Quantity</th><th style="text-align:right">Sub-Total (SAR)</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="tag tag-green">Adult</span></td>
+          <td><input type="number" min="0" value="${S.visa.adult}" oninput="S.visa.adult=+this.value;patchTotals()" style="width:90px"/></td>
+          <td><div class="counter">
+            <button onclick="changeAdults(-1)">−</button>
+            <span id="cnt-adults">${S.adults}</span>
+            <button onclick="changeAdults(1)">+</button>
+          </div></td>
+          <td class="td-num" id="vt-adult">SAR ${fmt(S.adults*S.visa.adult)}</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-gold">Child</span></td>
+          <td><input type="number" min="0" value="${S.visa.child}" oninput="S.visa.child=+this.value;patchTotals()" style="width:90px"/></td>
+          <td><div class="counter">
+            <button onclick="S.children=Math.max(0,S.children-1);document.getElementById('cnt-children').textContent=S.children;patchTotals()">−</button>
+            <span id="cnt-children">${S.children}</span>
+            <button onclick="S.children++;document.getElementById('cnt-children').textContent=S.children;patchTotals()">+</button>
+          </div></td>
+          <td class="td-num" id="vt-child">SAR ${fmt(S.children*S.visa.child)}</td>
+        </tr>
+        <tr>
+          <td><span class="tag" style="background:#f0eaf8;color:#6b3fa0">Infant</span></td>
+          <td><input type="number" min="0" value="${S.visa.infant}" oninput="S.visa.infant=+this.value;patchTotals()" style="width:90px"/></td>
+          <td><div class="counter">
+            <button onclick="S.infants=Math.max(0,S.infants-1);document.getElementById('cnt-infants').textContent=S.infants;patchTotals()">−</button>
+            <span id="cnt-infants">${S.infants}</span>
+            <button onclick="S.infants++;document.getElementById('cnt-infants').textContent=S.infants;patchTotals()">+</button>
+          </div></td>
+          <td class="td-num" id="vt-infant">SAR ${fmt(S.infants*S.visa.infant)}</td>
+        </tr>
+      </tbody>
+    </table></div>
+    <div class="sec-total"><span>Total Visa Cost:</span><span id="vt-total">SAR ${fmt(c.vt)}</span></div>
+  </div></div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TAB 2 — PILGRIMS
+// ═══════════════════════════════════════════════════════════
+function renderPilgrims(){
+  const cards=S.pilgrims.map((p,i)=>`
+    <div class="pcard">
+      <div class="pcard-hdr">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="pnum">${i+1}</div>
+          <span style="font-weight:600;font-size:.88rem">${esc(p.name)||'New Pilgrim'}</span>
+          <span class="tag tag-green">${p.pax}</span>
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="removePilgrim(${p.id})">✕ Remove</button>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Full Name</label>
+          <input value="${esc(p.name)}" oninput="updatePilgrimField(${p.id},'name',this.value);saveToStorage()"/></div>
+        <div class="form-group"><label>Passport No.</label>
+          <input value="${esc(p.passport)}" oninput="updatePilgrimField(${p.id},'passport',this.value);saveToStorage()"/></div>
+        <div class="form-group"><label>Date of Birth</label>
+          <input type="date" value="${p.dob}" onchange="updatePilgrimField(${p.id},'dob',this.value);saveToStorage()"/></div>
+        <div class="form-group"><label>PAX Type</label>
+          <select onchange="updatePilgrimField(${p.id},'pax',this.value);saveToStorage()">${PAXES.map(x=>`<option${x===p.pax?' selected':''}>${x}</option>`).join('')}</select></div>
+      </div>
+    </div>`).join('');
+  return `<div class="card">
+  <div class="card-header"><span>🕋</span><h2>Pilgrim Details — ${S.pilgrims.length} Pilgrim(s)</h2></div>
+  <div class="card-body">${cards}
+    <div class="btn-row"><button class="btn btn-primary" onclick="addPilgrim()">+ Add Pilgrim</button></div>
+  </div></div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TAB 3 — ACCOMMODATION
+// ═══════════════════════════════════════════════════════════
+function renderAccommodation(){
+  const c=calc();
+  const totalN=S.accommodation.reduce((s,a)=>s+nights(a.checkin,a.checkout),0);
+  const rows=S.accommodation.map(a=>{
+    const n=nights(a.checkin,a.checkout),amt=n*a.qty*a.rate;
+    return `<tr>
+      <td><select onchange="updateAccField(${a.id},'city',this.value);rerender();saveToStorage()" style="min-width:80px">
+        ${CITIES.map(c=>`<option${c===a.city?' selected':''}>${c}</option>`).join('')}</select></td>
+      <td><input value="${esc(a.hotel)}" oninput="updateAccField(${a.id},'hotel',this.value);saveToStorage()" style="min-width:130px"/></td>
+      <td><input type="date" value="${a.checkin}" onchange="updateAccField(${a.id},'checkin',this.value);rerender();saveToStorage()"/></td>
+      <td><input type="date" value="${a.checkout}" onchange="updateAccField(${a.id},'checkout',this.value);rerender();saveToStorage()"/></td>
+      <td class="td-center"><span class="night-badge" id="acc-nights-${a.id}">${n}N</span></td>
+      <td><select onchange="updateAccField(${a.id},'roomType',this.value);saveToStorage()" style="min-width:90px">
+        ${ROOMS.map(r=>`<option${r===a.roomType?' selected':''}>${r}</option>`).join('')}</select></td>
+      <td><input type="number" min="1" value="${a.qty}"
+        oninput="updateAccField(${a.id},'qty',+this.value);patchTotals()" style="width:52px"/></td>
+      <td><input type="number" min="0" step="0.01" value="${a.rate}"
+        oninput="updateAccField(${a.id},'rate',+this.value);patchTotals()" style="width:76px"/></td>
+      <td class="td-num" id="acc-amt-${a.id}">${fmt(amt)}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="removeAcc(${a.id})">✕</button></td>
+    </tr>`;}).join('');
+  return `<div class="card">
+  <div class="card-header"><span>🏨</span><h2>Accommodation</h2></div>
+  <div class="card-body">
+    <div class="table-wrap"><table>
+      <thead><tr><th>City</th><th>Hotel Name</th><th>Check-in</th><th>Check-out</th><th>Nights</th><th>Room Type</th><th>Qty</th><th>Rate/Night</th><th style="text-align:right">Amount (SAR)</th><th></th></tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr class="tfoot-row">
+        <td colspan="4" style="text-align:right;padding-right:12px">Total Accommodation</td>
+        <td class="td-center"><span class="night-badge" id="acc-total-nights">${totalN}N</span></td>
+        <td colspan="3"></td>
+        <td class="td-num" id="acc-total-footer">SAR ${fmt(c.at)}</td>
+        <td></td>
+      </tr></tfoot>
+    </table></div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="addAcc()">+ Add Hotel</button></div>
+    <div class="sec-total"><span>Total Accommodation (${totalN} nights):</span><span id="acc-total">SAR ${fmt(c.at)}</span></div>
+  </div></div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TAB 4 — TRANSPORT
+// ═══════════════════════════════════════════════════════════
+function renderTransport(){
+  const c=calc();
+  const rows=S.transport.map(t=>`<tr>
+    <td><select onchange="updateTrField(${t.id},'vehicle',this.value);saveToStorage()" style="min-width:130px">
+      ${VEHICLES.map(v=>`<option${v===t.vehicle?' selected':''}>${v}</option>`).join('')}</select></td>
+    <td><select onchange="updateTrField(${t.id},'route',this.value);saveToStorage()" style="min-width:180px">
+      ${ROUTES.map(r=>`<option${r===t.route?' selected':''}>${r}</option>`).join('')}</select></td>
+    <td><input type="number" min="0" value="${t.rate}"
+      oninput="updateTrField(${t.id},'rate',+this.value);patchTotals()" style="width:85px"/></td>
+    <td><input type="number" min="1" value="${t.qty}"
+      oninput="updateTrField(${t.id},'qty',+this.value);patchTotals()" style="width:55px"/></td>
+    <td class="td-num" id="tr-amt-${t.id}">${fmt(t.rate*t.qty)}</td>
+    <td><button class="btn btn-danger btn-sm" onclick="removeTr(${t.id})">✕</button></td>
+  </tr>`).join('');
+  return `<div class="card">
+  <div class="card-header"><span>🚌</span><h2>Ground Transportation</h2></div>
+  <div class="card-body">
+    <div class="table-wrap"><table>
+      <thead><tr><th>Vehicle Type</th><th>Route</th><th>Rate (SAR)</th><th>Qty</th><th style="text-align:right">Amount (SAR)</th><th></th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="addTr()">+ Add Transport</button></div>
+    <div class="sec-total"><span>Total Transportation:</span><span id="tr-total">SAR ${fmt(c.tt)}</span></div>
+  </div></div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TAB 5 — TICKETS (PKR ONLY)
+// ═══════════════════════════════════════════════════════════
+function renderTickets(){
+  const c=calc();
+  const rows=S.tickets.map(t=>{
+    const tot=t.adultRate*t.adultQty+t.childRate*t.childQty+t.infantRate*t.infantQty;
+    return `<tr>
+      <td><input value="${esc(t.description)}" oninput="updateTkField(${t.id},'description',this.value);saveToStorage()" style="min-width:180px"/></td>
+      <td><input type="number" min="0" value="${t.adultRate}" oninput="updateTkField(${t.id},'adultRate',+this.value);patchTotals()" style="width:85px"/></td>
+      <td><input type="number" min="0" value="${t.adultQty}" oninput="updateTkField(${t.id},'adultQty',+this.value);patchTotals()" style="width:52px"/></td>
+      <td><input type="number" min="0" value="${t.childRate}" oninput="updateTkField(${t.id},'childRate',+this.value);patchTotals()" style="width:85px"/></td>
+      <td><input type="number" min="0" value="${t.childQty}" oninput="updateTkField(${t.id},'childQty',+this.value);patchTotals()" style="width:52px"/></td>
+      <td><input type="number" min="0" value="${t.infantRate}" oninput="updateTkField(${t.id},'infantRate',+this.value);patchTotals()" style="width:85px"/></td>
+      <td><input type="number" min="0" value="${t.infantQty}" oninput="updateTkField(${t.id},'infantQty',+this.value);patchTotals()" style="width:52px"/></td>
+      <td class="td-pkr" id="tk-amt-${t.id}">PKR ${fmt(tot)}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="removeTk(${t.id})">✕</button></td>
+    </tr>`;}).join('');
+  return `
+  ${fxBanner()}
+  <div class="card">
+  <div class="card-header"><span>✈️</span><h2>Air Tickets (PKR Rates)</h2></div>
+  <div class="card-body">
+    <div class="note-box"><strong>ℹ️ Note</strong> All ticket rates should be entered in PKR (Pakistan Rupees). Totals automatically display in PKR.</div>
+    <div class="table-wrap" style="margin-top:12px"><table>
+      <thead><tr><th>Flight Description</th><th>Adult Rate (PKR)</th><th>Adult Qty</th><th>Child Rate (PKR)</th><th>Child Qty</th><th>Infant Rate (PKR)</th><th>Infant Qty</th><th style="text-align:right">Total (PKR)</th><th></th></tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr class="tfoot-row">
+        <td colspan="7" style="text-align:right;padding-right:12px">Total Tickets</td>
+        <td class="td-pkr" id="tk-total">PKR ${fmt(c.tk)}</td>
+        <td></td>
+      </tr></tfoot>
+    </table></div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="addTk()">+ Add Ticket Row</button></div>
+  </div></div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TAB 6 — SERVICES
+// ═══════════════════════════════════════════════════════════
+function renderServices(){
+  const c=calc();
+  const rows=S.services.map(sv=>{
+    const tot=sv.adultRate*sv.adultQty+sv.childRate*sv.childQty+sv.infantRate*sv.infantQty;
+    return `<tr>
+      <td><input value="${esc(sv.name)}" oninput="updateSvField(${sv.id},'name',this.value);saveToStorage()" style="min-width:150px"/></td>
+      <td><input type="number" min="0" value="${sv.adultRate}" oninput="updateSvField(${sv.id},'adultRate',+this.value);patchTotals()" style="width:76px"/></td>
+      <td><input type="number" min="0" value="${sv.adultQty}" oninput="updateSvField(${sv.id},'adultQty',+this.value);patchTotals()" style="width:52px"/></td>
+      <td><input type="number" min="0" value="${sv.childRate}" oninput="updateSvField(${sv.id},'childRate',+this.value);patchTotals()" style="width:76px"/></td>
+      <td><input type="number" min="0" value="${sv.childQty}" oninput="updateSvField(${sv.id},'childQty',+this.value);patchTotals()" style="width:52px"/></td>
+      <td><input type="number" min="0" value="${sv.infantRate}" oninput="updateSvField(${sv.id},'infantRate',+this.value);patchTotals()" style="width:76px"/></td>
+      <td><input type="number" min="0" value="${sv.infantQty}" oninput="updateSvField(${sv.id},'infantQty',+this.value);patchTotals()" style="width:52px"/></td>
+      <td class="td-num" id="sv-amt-${sv.id}">${fmt(tot)}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="removeSv(${sv.id})">✕</button></td>
+    </tr>`;}).join('');
+  return `<div class="card">
+  <div class="card-header"><span>🎯</span><h2>Additional Services</h2></div>
+  <div class="card-body">
+    <div class="table-wrap"><table>
+      <thead><tr><th>Service Name</th><th>Adult Rate (SAR)</th><th>Adult Qty</th><th>Child Rate (SAR)</th><th>Child Qty</th><th>Infant Rate (SAR)</th><th>Infant Qty</th><th style="text-align:right">Total (SAR)</th><th></th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="addSv()">+ Add Service</button></div>
+    <div class="sec-total"><span>Total Services:</span><span id="sv-total">SAR ${fmt(c.sv)}</span></div>
+  </div></div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TAB 7 — SUMMARY
+// ═══════════════════════════════════════════════════════════
+function renderSummary(){
+  const c=calc();const b=S.booking;
+  const totalN=S.accommodation.reduce((s,a)=>s+nights(a.checkin,a.checkout),0);
+  const pax=S.adults+S.children+S.infants;
+
+  const logoBlock=S.logoData
+    ?`<img src="${S.logoData}" alt="Agency Logo" class="summary-logo"/>`
+    :`<div style="width:80px;height:80px;border-radius:10px;background:var(--section-bg);border:2px dashed var(--border);
+        display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--text-soft);text-align:center;padding:6px">
+        No Logo</div>`;
+
+  const accRows=S.accommodation.map(a=>{
+    const n=nights(a.checkin,a.checkout);
+    return `<tr>
+      <td><span class="tag tag-green">${a.city}</span></td>
+      <td style="font-weight:600">${esc(a.hotel)}</td>
+      <td>${a.checkin}</td><td>${a.checkout}</td>
+      <td class="td-center"><span class="night-badge">${n}N</span></td>
+      <td>${a.roomType}</td><td class="td-center">${a.qty}</td><td>${a.rate}</td>
+      <td class="td-num">${fmt(n*a.qty*a.rate)}</td>
+    </tr>`;}).join('');
+
+  return `
+  <div class="card">
+    <div class="card-body" style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+      ${logoBlock}
+      <div style="flex:1;min-width:200px">
+        <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--emerald)">${esc(b.agencyName)}</div>
+        <div style="font-size:.78rem;color:var(--text-soft);margin-top:2px">${esc(b.address)}</div>
+        <div style="font-size:.78rem;color:var(--text-soft)">${esc(b.phone)}</div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:8px">
+          <div><span style="font-size:.68rem;text-transform:uppercase;color:var(--text-soft);font-weight:600">Booking</span><div style="font-weight:700;font-size:.88rem">${esc(b.bookingNo)}</div></div>
+          <div><span style="font-size:.68rem;text-transform:uppercase;color:var(--text-soft);font-weight:600">Agency</span><div style="font-weight:700;font-size:.88rem">${esc(b.agencyLabel)}</div></div>
+          <div><span style="font-size:.68rem;text-transform:uppercase;color:var(--text-soft);font-weight:600">Package</span><div style="font-weight:700;font-size:.88rem">${esc(b.packageType)}</div></div>
+          <div><span style="font-size:.68rem;text-transform:uppercase;color:var(--text-soft);font-weight:600">Total Pax</span><div style="font-weight:700;font-size:.88rem">${pax}</div></div>
+          <div><span style="font-size:.68rem;text-transform:uppercase;color:var(--text-soft);font-weight:600">Voucher Date</span><div style="font-weight:700;font-size:.88rem">${b.voucherDate}</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  ${fxBanner()}
+
+  <div class="summary-grid">
+    <div class="card">
+      <div class="card-header"><span>💰</span><h2>Cost Breakdown</h2></div>
+      <div class="card-body">
+        <div class="sum-row">
+          <span class="sum-label">🛂 Visa (${S.adults}A+${S.children}C+${S.infants}I)</span>
+          <div class="sum-val-wrap"><span class="sum-val" id="sum-vt">SAR ${fmt(c.vt)}</span><span class="sum-pkr" id="sum-vt-pkr">≈ PKR ${fmtPKR(c.vt)}</span></div>
+        </div>
+        <div class="sum-row">
+          <span class="sum-label">🏨 Accommodation</span>
+          <div class="sum-val-wrap"><span class="sum-val" id="sum-at">SAR ${fmt(c.at)}</span><span class="sum-pkr" id="sum-at-pkr">≈ PKR ${fmtPKR(c.at)}</span></div>
+        </div>
+        <div class="sum-row">
+          <span class="sum-label">🚌 Transportation</span>
+          <div class="sum-val-wrap"><span class="sum-val" id="sum-tt">SAR ${fmt(c.tt)}</span><span class="sum-pkr" id="sum-tt-pkr">≈ PKR ${fmtPKR(c.tt)}</span></div>
+        </div>
+        <div class="sum-row">
+          <span class="sum-label">✈️ Air Tickets</span>
+          <div class="sum-val-wrap"><span class="sum-val" id="sum-tk">PKR ${fmt(c.tk)}</span><span class="sum-pkr" id="sum-tk-pkr">(PKR Only)</span></div>
+        </div>
+        <div class="sum-row">
+          <span class="sum-label">🎯 Services</span>
+          <div class="sum-val-wrap"><span class="sum-val" id="sum-sv">SAR ${fmt(c.sv)}</span><span class="sum-pkr" id="sum-sv-pkr">≈ PKR ${fmtPKR(c.sv)}</span></div>
+        </div>
+        <div class="sum-row gross">
+          <span class="sum-label" style="font-weight:700">Gross Amount</span>
+          <div class="sum-val-wrap"><span class="sum-val green" id="sum-gross">SAR ${fmt(c.gross)}</span><span class="sum-pkr" id="sum-gross-pkr">≈ PKR ${fmtPKR(c.gross)}</span></div>
+        </div>
+        <div class="sum-row" style="margin-top:6px">
+          <span class="sum-label">Adjustment / Discount</span>
+          <div style="display:flex;align-items:center;gap:5px">
+            <span style="color:var(--text-soft);font-size:.78rem">SAR</span>
+            <input type="number" min="0" value="${S.adjustment}" oninput="S.adjustment=+this.value;patchTotals()"
+              style="width:85px;border:1.5px solid var(--border);border-radius:6px;padding:4px 8px;font-family:inherit;font-size:.85rem"/>
+          </div>
+        </div>
+        <div class="sum-row total">
+          <span>Net Amount</span>
+          <div class="sum-val-wrap"><span class="sum-val green" id="sum-net">SAR ${fmt(c.net)}</span><span class="sum-pkr" id="sum-net-pkr">≈ PKR ${fmtPKR(c.net)}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span>💳</span><h2>Payment Status</h2></div>
+      <div class="card-body">
+        <div class="sum-row"><span class="sum-label">Net Amount Due</span><span class="sum-val" id="sum-net2">SAR ${fmt(c.net)}</span></div>
+        <div class="sum-row">
+          <span class="sum-label">Receipts Collected</span>
+          <div style="display:flex;align-items:center;gap:5px">
+            <span style="color:var(--text-soft);font-size:.78rem">SAR</span>
+            <input type="number" min="0" value="${S.receipts}" oninput="S.receipts=+this.value;patchTotals()"
+              style="width:95px;border:1.5px solid var(--border);border-radius:6px;padding:4px 8px;font-family:inherit;font-size:.85rem"/>
+          </div>
+        </div>
+        <div class="sum-row total">
+          <span>Balance Remaining</span>
+          <div class="sum-val-wrap">
+            <span id="sum-bal" style="font-weight:700;color:${c.bal>0?'var(--danger)':'var(--emerald-light)'}">SAR ${fmt(c.bal)}</span>
+            <span class="sum-pkr" id="sum-bal-pkr">≈ PKR ${fmtPKR(c.bal)}</span>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div style="background:#eef3fc;border-radius:8px;padding:12px 14px">
+          <div style="font-size:.7rem;text-transform:uppercase;font-weight:700;color:var(--pkr);letter-spacing:.5px;margin-bottom:8px">🇵🇰 PKR Summary</div>
+          <div style="font-size:.82rem;color:var(--pkr);line-height:2">
+            <div><strong>Gross:</strong> PKR ${fmtPKR(c.gross)}</div>
+            <div><strong>Net:</strong> PKR ${fmtPKR(c.net)}</div>
+            <div><strong>Balance:</strong> PKR ${fmtPKR(c.bal)}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span>🏨</span><h2>Hotel Itinerary</h2></div>
+    <div class="card-body">
+      <div class="table-wrap"><table>
+        <thead><tr><th>City</th><th>Hotel</th><th>Check-in</th><th>Check-out</th><th>Nights</th><th>Room</th><th>Qty</th><th>Rate</th><th style="text-align:right">Amount (SAR)</th></tr></thead>
+        <tbody>${accRows}</tbody>
+        <tfoot><tr class="tfoot-row">
+          <td colspan="4" style="text-align:right;padding-right:12px">Total Accommodation</td>
+          <td class="td-center"><span class="night-badge">${totalN}N</span></td>
+          <td colspan="3"></td>
+          <td class="td-num">SAR ${fmt(c.at)}</td>
+        </tr></tfoot>
+      </table></div>
+    </div>
+  </div>
+
+  <div class="grand-box">
+    <div>
+      <div class="grand-label">Total Package Cost</div>
+      <div class="grand-sub">${esc(b.agencyLabel)} · ${pax} Pilgrim(s) · ${esc(b.packageType)}</div>
+    </div>
+    <div style="text-align:right">
+      <div class="grand-amount" id="grand-amount">SAR ${fmt(c.net)}</div>
+      <div class="grand-pkr" id="grand-pkr">≈ PKR ${fmtPKR(c.net)}</div>
+      <div class="grand-sub" id="grand-bal">Balance: SAR ${fmt(c.bal)} / PKR ${fmtPKR(c.bal)}</div>
+    </div>
+  </div>
+  
+  <div class="btn-row" style="margin-top:14px">
+    <button class="btn btn-success" onclick="addToHistory()">💾 Save Package</button>
+    <button class="btn btn-gold" onclick="window.print()">🖨️ Print Invoice</button>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  RENDER SUMMARY FOR MODAL
+// ═══════════════════════════════════════════════════════════
+function renderSummaryForModal(savedS){
+  const c=calc(savedS);
+  const b=savedS.booking;
+  const totalN=savedS.accommodation.reduce((s,a)=>s+nights(a.checkin,a.checkout),0);
+  const pax=savedS.adults+savedS.children+savedS.infants;
+
+  const logoBlock=savedS.logoData
+    ?`<img src="${savedS.logoData}" alt="Agency Logo" class="summary-logo"/>`
+    :`<div style="width:80px;height:80px;border-radius:10px;background:var(--section-bg);border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--text-soft);text-align:center;padding:6px">No Logo</div>`;
+
+  const accRows=savedS.accommodation.map(a=>{
+    const n=nights(a.checkin,a.checkout);
+    return `<tr>
+      <td><span class="tag tag-green">${a.city}</span></td>
+      <td style="font-weight:600">${esc(a.hotel)}</td>
+      <td>${a.checkin}</td><td>${a.checkout}</td>
+      <td class="td-center"><span class="night-badge">${n}N</span></td>
+      <td>${a.roomType}</td><td class="td-center">${a.qty}</td><td>${a.rate}</td>
+      <td class="td-num">${fmt(n*a.qty*a.rate)}</td>
+    </tr>`;}).join('');
+
+  return `
+  <div class="card">
+    <div class="card-body" style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+      ${logoBlock}
+      <div style="flex:1;min-width:200px">
+        <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--emerald)">${esc(b.agencyName)}</div>
+        <div style="font-size:.78rem;color:var(--text-soft);margin-top:2px">${esc(b.address)}</div>
+        <div style="font-size:.78rem;color:var(--text-soft)">${esc(b.phone)}</div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:8px">
+          <div><span style="font-size:.68rem;text-transform:uppercase;color:var(--text-soft);font-weight:600">Booking</span><div style="font-weight:700;font-size:.88rem">${esc(b.bookingNo)}</div></div>
+          <div><span style="font-size:.68rem;text-transform:uppercase;color:var(--text-soft);font-weight:600">Agency</span><div style="font-weight:700;font-size:.88rem">${esc(b.agencyLabel)}</div></div>
+          <div><span style="font-size:.68rem;text-transform:uppercase;color:var(--text-soft);font-weight:600">Package</span><div style="font-weight:700;font-size:.88rem">${esc(b.packageType)}</div></div>
+          <div><span style="font-size:.68rem;text-transform:uppercase;color:var(--text-soft);font-weight:600">Total Pax</span><div style="font-weight:700;font-size:.88rem">${pax}</div></div>
+          <div><span style="font-size:.68rem;text-transform:uppercase;color:var(--text-soft);font-weight:600">Voucher Date</span><div style="font-weight:700;font-size:.88rem">${b.voucherDate}</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="card">
+      <div class="card-header"><span>💰</span><h2>Cost Breakdown</h2></div>
+      <div class="card-body">
+        <div class="sum-row">
+          <span class="sum-label">🛂 Visa (${savedS.adults}A+${savedS.children}C+${savedS.infants}I)</span>
+          <div class="sum-val-wrap"><span class="sum-val">SAR ${fmt(c.vt)}</span><span class="sum-pkr">≈ PKR ${fmtPKR(c.vt,savedS.exchangeRate)}</span></div>
+        </div>
+        <div class="sum-row">
+          <span class="sum-label">🏨 Accommodation</span>
+          <div class="sum-val-wrap"><span class="sum-val">SAR ${fmt(c.at)}</span><span class="sum-pkr">≈ PKR ${fmtPKR(c.at,savedS.exchangeRate)}</span></div>
+        </div>
+        <div class="sum-row">
+          <span class="sum-label">🚌 Transportation</span>
+          <div class="sum-val-wrap"><span class="sum-val">SAR ${fmt(c.tt)}</span><span class="sum-pkr">≈ PKR ${fmtPKR(c.tt,savedS.exchangeRate)}</span></div>
+        </div>
+        <div class="sum-row">
+          <span class="sum-label">✈️ Air Tickets</span>
+          <div class="sum-val-wrap"><span class="sum-val">PKR ${fmt(c.tk)}</span><span class="sum-pkr">(PKR Only)</span></div>
+        </div>
+        <div class="sum-row">
+          <span class="sum-label">🎯 Services</span>
+          <div class="sum-val-wrap"><span class="sum-val">SAR ${fmt(c.sv)}</span><span class="sum-pkr">≈ PKR ${fmtPKR(c.sv,savedS.exchangeRate)}</span></div>
+        </div>
+        <div class="sum-row gross">
+          <span class="sum-label" style="font-weight:700">Gross Amount</span>
+          <div class="sum-val-wrap"><span class="sum-val green">SAR ${fmt(c.gross)}</span><span class="sum-pkr">≈ PKR ${fmtPKR(c.gross,savedS.exchangeRate)}</span></div>
+        </div>
+        <div class="sum-row total">
+          <span>Net Amount</span>
+          <div class="sum-val-wrap"><span class="sum-val green">SAR ${fmt(c.net)}</span><span class="sum-pkr">≈ PKR ${fmtPKR(c.net,savedS.exchangeRate)}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span>💳</span><h2>Payment Status</h2></div>
+      <div class="card-body">
+        <div class="sum-row"><span class="sum-label">Net Amount Due</span><span class="sum-val">SAR ${fmt(c.net)}</span></div>
+        <div class="sum-row total">
+          <span>Balance Remaining</span>
+          <div class="sum-val-wrap">
+            <span style="font-weight:700;color:${c.bal>0?'var(--danger)':'var(--emerald-light)'}">SAR ${fmt(c.bal)}</span>
+            <span class="sum-pkr">≈ PKR ${fmtPKR(c.bal,savedS.exchangeRate)}</span>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div style="background:#eef3fc;border-radius:8px;padding:12px 14px">
+          <div style="font-size:.7rem;text-transform:uppercase;font-weight:700;color:var(--pkr);letter-spacing:.5px;margin-bottom:8px">🇵🇰 PKR Summary</div>
+          <div style="font-size:.82rem;color:var(--pkr);line-height:2">
+            <div><strong>Gross:</strong> PKR ${fmtPKR(c.gross,savedS.exchangeRate)}</div>
+            <div><strong>Net:</strong> PKR ${fmtPKR(c.net,savedS.exchangeRate)}</div>
+            <div><strong>Balance:</strong> PKR ${fmtPKR(c.bal,savedS.exchangeRate)}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span>🏨</span><h2>Hotel Itinerary</h2></div>
+    <div class="card-body">
+      <div class="table-wrap"><table>
+        <thead><tr><th>City</th><th>Hotel</th><th>Check-in</th><th>Check-out</th><th>Nights</th><th>Room</th><th>Qty</th><th>Rate</th><th style="text-align:right">Amount (SAR)</th></tr></thead>
+        <tbody>${accRows}</tbody>
+        <tfoot><tr class="tfoot-row">
+          <td colspan="4" style="text-align:right;padding-right:12px">Total Accommodation</td>
+          <td class="td-center"><span class="night-badge">${totalN}N</span></td>
+          <td colspan="3"></td>
+          <td class="td-num">SAR ${fmt(c.at)}</td>
+        </tr></tfoot>
+      </table></div>
+    </div>
+  </div>
+
+  <div class="grand-box">
+    <div>
+      <div class="grand-label">Total Package Cost</div>
+      <div class="grand-sub">${esc(b.agencyLabel)} · ${pax} Pilgrim(s) · ${esc(b.packageType)}</div>
+    </div>
+    <div style="text-align:right">
+      <div class="grand-amount">SAR ${fmt(c.net)}</div>
+      <div class="grand-pkr">≈ PKR ${fmtPKR(c.net,savedS.exchangeRate)}</div>
+      <div class="grand-sub">Balance: SAR ${fmt(c.bal)} / PKR ${fmtPKR(c.bal,savedS.exchangeRate)}</div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TAB 8 — HISTORY
+// ═══════════════════════════════════════════════════════════
+function renderHistory(){
+  const history=getHistory();
+  const html=history.length===0
+    ?`<div class="empty-state">📭 No saved packages yet<br><br>Calculate a package and click <strong>"Save Package"</strong> in the Summary tab to save it here.</div>`
+    :history.map(h=>`
+    <div class="history-item">
+      <div class="history-item-info">
+        <div class="history-item-name">${esc(h.agencyLabel)}</div>
+        <div class="history-item-meta">${h.pax} pilgrim(s) · ${h.timestamp}</div>
+      </div>
+      <div class="history-item-amount">SAR ${fmt(h.net)}<br><span style="font-size:.7rem;color:var(--pkr)">PKR ${fmt(h.netPKR)}</span></div>
+      <div class="history-actions">
+        <button class="btn btn-secondary btn-sm" onclick="loadHistoryItem(${h.id})">↩️ Load</button>
+        <button class="btn btn-primary btn-sm" onclick="viewHistoryItem(${h.id})">👁️ View</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteHistoryItem(${h.id})">✕</button>
+      </div>
+    </div>`).join('');
+
+  return `<div class="card">
+  <div class="card-header"><span>📜</span><h2>Recent Packages (Last 50)</h2></div>
+  <div class="card-body">
+    <div class="history-panel">${html}</div>
+    ${history.length>0?`<div class="btn-row" style="margin-top:12px">
+      <button class="btn btn-danger" onclick="if(confirm('Delete ALL history?')){localStorage.removeItem('${HISTORY_KEY}');rerender()}">🗑 Clear All History</button>
+    </div>`:''}
+  </div></div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  FIELD UPDATERS
+// ═══════════════════════════════════════════════════════════
+function updatePilgrimField(id,k,v){const p=S.pilgrims.find(x=>x.id===id);if(p)p[k]=v}
+function updateAccField(id,k,v){const a=S.accommodation.find(x=>x.id===id);if(a)a[k]=v}
+function updateTrField(id,k,v){const t=S.transport.find(x=>x.id===id);if(t)t[k]=v}
+function updateTkField(id,k,v){const t=S.tickets.find(x=>x.id===id);if(t)t[k]=v}
+function updateSvField(id,k,v){const s=S.services.find(x=>x.id===id);if(s)s[k]=v}
+
+// ═══════════════════════════════════════════════════════════
+//  STRUCTURAL MUTATIONS
+// ═══════════════════════════════════════════════════════════
+function changeAdults(d){
+  S.adults=Math.max(0,S.adults+d);
+  if(d>0)S.pilgrims.push({id:uid(),passport:'',name:'',dob:'',pax:'Adult'});
+  else if(d<0&&S.pilgrims.length>0)S.pilgrims.pop();
+  saveToStorage();
+  rerender();
+}
+function addPilgrim(){S.pilgrims.push({id:uid(),passport:'',name:'',dob:'',pax:'Adult'});S.adults++;saveToStorage();rerender()}
+function removePilgrim(id){S.pilgrims=S.pilgrims.filter(x=>x.id!==id);S.adults=Math.max(0,S.adults-1);saveToStorage();rerender()}
+function addAcc(){S.accommodation.push({id:uid(),city:'Makkah',hotel:'',checkin:'',checkout:'',roomType:'Quint Bed',qty:1,rate:0});saveToStorage();rerender()}
+function removeAcc(id){S.accommodation=S.accommodation.filter(x=>x.id!==id);saveToStorage();rerender()}
+function addTr(){S.transport.push({id:uid(),vehicle:'Economy By Bus',route:ROUTES[0],rate:0,qty:1});saveToStorage();rerender()}
+function removeTr(id){S.transport=S.transport.filter(x=>x.id!==id);saveToStorage();rerender()}
+function addTk(){S.tickets.push({id:uid(),description:'ABC Airlines Flight',adultRate:0,adultQty:0,childRate:0,childQty:0,infantRate:0,infantQty:0});saveToStorage();rerender()}
+function removeTk(id){S.tickets=S.tickets.filter(x=>x.id!==id);saveToStorage();rerender()}
+function addSv(){S.services.push({id:uid(),name:'ABC Service',adultRate:0,adultQty:0,childRate:0,childQty:0,infantRate:0,infantQty:0});saveToStorage();rerender()}
+function removeSv(id){S.services=S.services.filter(x=>x.id!==id);saveToStorage();rerender()}
+
+// ═══════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════
+updateHeaderLogo();
+updateHeaderFromState();
+rerender();
+patchTotals();
+</script>
+</body>
+</html>
